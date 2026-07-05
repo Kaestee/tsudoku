@@ -7,13 +7,15 @@ import commands.GameInput;
 import commands.MenuInput;
 
 public class App {
-    public static final String COLOR_RESET    = "\033[0m";    // Color Reset
-    public static final String COLOR_ERROR    = "\033[0;91m"; // Red
-    public static final String COLOR_SAFE     = "\033[0;92m"; // Green
-    public static final String COLOR_CONSTANT = "\033[0;97m"; // White
-    public static final String COLOR_COMMAND  = "\033[0;33m"; // Yellow
-    public static final String COLOR_FADED    = "\033[0;30m"; // Gray
-    public static final String SPACE          = "\n".repeat(35);
+    public static final String COLOR_RESET          = "\033[0m";    // Color Reset
+    public static final String COLOR_ERROR          = "\033[0;91m"; // Bright Red
+    public static final String COLOR_CELL_SAFE      = "\033[0;92m"; // Bright Green
+    public static final String COLOR_CELL_ERROR     = "\033[4;91m"; // Bright Underlined Red
+    public static final String COLOR_CONSTANT       = "\033[0;97m"; // Bright White
+    public static final String COLOR_CONSTANT_ERROR = "\033[0;31m"; // Red
+    public static final String COLOR_COMMAND        = "\033[0;33m"; // Yellow
+    public static final String COLOR_FADED          = "\033[0;30m"; // Gray
+    public static final String SPACE                = "\n".repeat(35);
 
     public static String errorMessage; // Shown before asking for the player's command in Sudoku
 
@@ -199,9 +201,16 @@ public class App {
             System.out.print("║ " + COLOR_FADED + (i+1) + COLOR_RESET + " │");
             for (int j = 0; j < row.length; j++) {
                 int num = row[j].getNumber();
-                String numout = (boardObject.isCellValid(j+1, i+1) ? (board[i][j].isReadOnly() ? COLOR_CONSTANT : COLOR_SAFE) : COLOR_ERROR) + num + COLOR_RESET;
-                System.out.print(" " + (num == 0 ? COLOR_RESET + " " : numout) + ((j + 1) % 3 == 0 ? " │" : ""));
-
+                boolean valid = boardObject.isCellValid(j+1, i+1);
+                StringBuilder numout = new StringBuilder();
+                if (board[i][j].isReadOnly()) {
+                    numout.append(valid ? COLOR_CONSTANT : COLOR_CONSTANT_ERROR);
+                }
+                else {
+                    numout.append(valid ? COLOR_CELL_SAFE : COLOR_CELL_ERROR);
+                }
+                numout.append(num).append(COLOR_RESET);
+                System.out.print(" " + (num == 0 ? COLOR_RESET + " " : numout.toString()) + ((j + 1) % 3 == 0 ? " │" : ""));
             }
 
             System.out.println();
