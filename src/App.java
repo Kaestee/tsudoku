@@ -14,7 +14,7 @@ public class App {
     public static final String COLOR_CONSTANT       = "\033[0;97m"; // Bright White
     public static final String COLOR_CONSTANT_ERROR = "\033[0;31m"; // Red
     public static final String COLOR_COMMAND        = "\033[0;33m"; // Yellow
-    public static final String COLOR_FADED          = "\033[0;30m"; // Gray
+    public static final String COLOR_FADED          = "\033[0;90m"; // Gray
     public static final String SPACE                = "\n".repeat(35);
 
     public static String errorMessage; // Shown before asking for the player's command in Sudoku
