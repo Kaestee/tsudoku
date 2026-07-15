@@ -79,7 +79,7 @@ public class App {
                         boardComplete = true;
                         break;
                     }
-                    else if (lost) {
+                    else if (gaveUp || lost) {
                         lost = true;
                         break;
                     }
@@ -151,7 +151,6 @@ public class App {
 
                     else if (gameInput == GameInput.RESIGN) {
                         gaveUp = true;
-                        break;
                     }
                 }
             }
