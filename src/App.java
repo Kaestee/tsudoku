@@ -17,7 +17,9 @@ public class App {
     public static final String COLOR_FADED          = "\033[0;90m"; // Gray
     public static final String SPACE                = "\n".repeat(35);
 
-    public static String errorMessage; // Shown before asking for the player's command in Sudoku
+    private static String errorMessage; // Shown before asking for the player's command in Sudoku
+    private static boolean livesUpdated = false;
+    private static int lives;
 
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
@@ -26,6 +28,7 @@ public class App {
 
         boolean boardComplete = false;
         boolean gaveUp = false;
+        boolean lost = false;
 
         while (true) {
             renderMenu();
@@ -43,13 +46,23 @@ public class App {
             }
 
             try {
-                board = switch ((MenuInput) MenuInput.getCommand(menuInput)) {
-                    case EASY -> new Board(15);
-                    case MEDIUM -> new Board(24);
-                    case HARD -> new Board(32);
-                    case TEST -> new Board(1);
-                    default -> null; // Impossible to trigger but required by compiler
-                };
+                MenuInput input = (MenuInput) MenuInput.getCommand(menuInput);
+                if (input == MenuInput.EASY) {
+                    board = new Board(15);
+                    lives = 5;
+                }
+                else if (input == MenuInput.MEDIUM) {
+                    board = new Board(24);
+                    lives = 3;
+                }
+                else if (input == MenuInput.HARD) {
+                    board = new Board(32);
+                    lives = 3;
+                }
+                else if (input == MenuInput.TEST) {
+                    board = new Board(1);
+                    lives = 9;
+                }
             }
             catch(IllegalArgumentException e) {
                 errorMessage = "Select one of the options!";
@@ -64,6 +77,10 @@ public class App {
         
                     if (boardState == BoardState.COMPLETE) {
                         boardComplete = true;
+                        break;
+                    }
+                    else if (lost) {
+                        lost = true;
                         break;
                     }
                     
@@ -88,6 +105,16 @@ public class App {
                         if (cell.isReadOnly()) {
                             errorMessage = "Number at [" + inputs[0] + ", " + inputs[1] + "] can't be set to.";
                             continue;
+                        }
+
+                        // Lose lives when miss
+                        if (inputs[2] != cell.getNumber() && inputs[2] != cell.getExpectedNumber()) {
+                            lives--;
+                            livesUpdated = true;
+
+                            if (lives == 0) {
+                                lost = true;
+                            }
                         }
 
                         cell.setNumber(inputs[2]);
@@ -147,6 +174,14 @@ public class App {
                 System.out.println("╚══════════════════════════╝");
                 break;
             }
+            else if (lost) {
+                System.out.println("╔══════════SUDOKU══════════╗");
+                System.out.println("║                          ║");
+                System.out.printf("║      %sLives ran out!%s      ║\n", COLOR_ERROR, COLOR_RESET);
+                System.out.println("║                          ║");
+                System.out.println("╚══════════════════════════╝");
+                break;
+            }
         }
 
         scanner.close();
@@ -182,6 +217,8 @@ public class App {
             System.out.println("╠> " + COLOR_ERROR + errorMessage + COLOR_RESET);
             errorMessage = null;
         }
+        System.out.println("╠> " + (livesUpdated ? COLOR_ERROR : "\033[0;32m") + "Lives: " + lives + COLOR_RESET);
+        livesUpdated = false;
         System.out.print  ("╚> ");
     }
 
